@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CrowdSentinel control room</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <div>
+        <h1>CrowdSentinel</h1>
+        <p id="venue-name">Connecting to the twin…</p>
+      </div>
+    </div>
+    <dl class="readouts">
+      <div><dt>Event time</dt><dd id="clock">--:--</dd></div>
+      <div><dt>Phase</dt><dd id="phase">–</dd></div>
+      <div><dt>People on ground</dt><dd id="people">–</dd></div>
+      <div class="truth-only"><dt>Simulated truth</dt><dd id="truth-people">–</dd></div>
+      <div><dt>Twin update</dt><dd id="tick">–</dd></div>
+    </dl>
+    <div class="live-state" id="live-state" data-mode="live">Live</div>
+  </header>
+
+  <main class="layout">
+    <section class="map-panel" aria-label="Venue map">
+      <div class="map-toolbar">
+        <fieldset class="layers">
+          <legend class="sr">Map layers</legend>
+          <label><input type="radio" name="base" value="density" checked> Estimated density</label>
+          <label><input type="radio" name="base" value="truth"> Simulated truth</label>
+          <label><input type="checkbox" id="lyr-unc" checked> Uncertainty</label>
+          <label><input type="checkbox" id="lyr-flow" checked> Movement</label>
+          <label><input type="checkbox" id="lyr-evac"> Evacuation routes</label>
+          <label><input type="checkbox" id="lyr-cams"> Camera coverage</label>
+        </fieldset>
+      </div>
+      <div class="map-wrap" id="map-wrap">
+        <canvas id="map" role="img" aria-label="Live crowd density map of the venue"></canvas>
+        <div class="zone-card" id="zone-card" hidden></div>
+      </div>
+      <div class="legend" aria-label="Legend">
+        <div class="ramp">
+          <span>Persons per m²</span>
+          <div class="ramp-bar"></div>
+          <div class="ramp-ticks"><span>0</span><span>2</span><span>4</span><span>6+</span></div>
+        </div>
+        <div class="key"><span class="sw hatch"></span> Unverified: the twin is unsure here</div>
+        <div class="key"><span class="sw drone"></span> Drone camera footprint</div>
+        <div class="key"><span class="sw crit"></span> Critical zone</div>
+      </div>
+    </section>
+
+    <aside class="rail">
+      <section class="block" aria-labelledby="h-alerts">
+        <h2 id="h-alerts">Alerts <span class="count" id="alert-count">0</span></h2>
+        <ol class="alerts" id="alerts"><li class="empty">No alerts. All zones are below 4 persons per m².</li></ol>
+      </section>
+      <section class="block" aria-labelledby="h-actions">
+        <h2 id="h-actions">Suggested actions</h2>
+        <ul class="actions" id="actions"><li class="empty">Nothing to do right now.</li></ul>
+        <table class="gates" id="gates"></table>
+      </section>
+      <section class="block" aria-labelledby="h-drone">
+        <h2 id="h-drone">Drone</h2>
+        <p class="drone-reason" id="drone-reason">–</p>
+        <label class="select">Guidance
+          <select id="policy">
+            <option value="active">Active: go where the twin is blind</option>
+            <option value="patrol">Fixed patrol route</option>
+            <option value="random">Random waypoints</option>
+            <option value="hover">Hover over the centre</option>
+          </select>
+        </label>
+      </section>
+      <section class="block" aria-labelledby="h-sources">
+        <h2 id="h-sources">Data sources</h2>
+        <ul class="sources" id="sources"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="timeline">
+    <div class="transport">
+      <button id="btn-pause" type="button">Pause</button>
+      <div class="speed" role="group" aria-label="Playback speed">
+        <button type="button" data-speed="1">1×</button>
+        <button type="button" data-speed="4" class="on">4×</button>
+        <button type="button" data-speed="10">10×</button>
+      </div>
+      <button id="btn-live" type="button" hidden>Back to live</button>
+      <button id="btn-restart" type="button">Restart event</button>
+    </div>
+    <div class="track-wrap">
+      <div class="phases" id="phases"></div>
+      <div class="marks" id="marks"></div>
+      <input type="range" id="scrub" min="0" max="0" value="0" aria-label="Replay position">
+    </div>
+  </footer>
+  <script src="/static/app.js"></script>
+</body>
+</html>
