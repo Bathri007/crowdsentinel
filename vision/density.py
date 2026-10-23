@@ -6,11 +6,11 @@ heat map whose sum is the number of people, and works at 5+ persons/m2.
 
 Pretrained weights (download once, put them in vision/weights/):
     https://github.com/cvlab-stonybrook/DM-Count  -> "Pretrained models"
-    model_sha.pth  (ShanghaiTech Part A, dense crowds)  <- recommended
+    model_sh_A.pth  (ShanghaiTech Part A, dense crowds)  <- recommended
     model_qnrf.pth (UCF-QNRF, very dense crowds)
 
 Usage:
-    est = DensityEstimator("vision/weights/model_sha.pth")
+    est = DensityEstimator("vision/weights/model_sh_A.pth")
     dmap = est.predict(frame_bgr)        # 2-D array, one value per 8x8 pixel block
     people = dmap.sum()
 """

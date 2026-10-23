@@ -4,6 +4,8 @@ A real-time crowd safety digital twin for a police control room. It fuses CCTV, 
 
 ![Control room dashboard](docs/dashboard.png)
 
+**Demo video (2 min):** [docs/demo.mp4](docs/demo.mp4) · **Paper (4 pages):** [docs/paper/crowdsentinel.pdf](docs/paper/crowdsentinel.pdf)
+
 ## Why
 
 Crowd crushes keep happening at rallies, festivals and concerts, including at events watched by AI cameras. Camera dashboards count people where cameras point, but crushes often start where nobody is looking. CrowdSentinel treats those blind spots as a first-class problem.
@@ -22,6 +24,8 @@ Crowd crushes keep happening at rallies, festivals and concerts, including at ev
 | Density error, zones with no camera | 0.348 | **0.083** (−76%) |
 | Dangerous zones (≥ 4/m²) caught | 19% | **87%** |
 | Zones that turned critical and were detected | 3 of 25 | **25 of 25**, ~69 s early on average |
+
+On real images, the DM-Count model in the vision module reaches an MAE of **60.3** people on ShanghaiTech Part A and **7.7** on Part B (published: 59.7 and 7.4), at about 2 s per image on a laptop CPU.
 
 Active drone guidance cut the error in no-camera zones by **49%** compared with a fixed patrol route. Full tables, ablations and honest limitations: [experiments/results/results.md](experiments/results/results.md).
 
@@ -58,37 +62,25 @@ Active drone guidance cut the error in no-camera zones by **49%** compared with 
 
 You need Python 3.10 or newer ([python.org](https://www.python.org/downloads/), tick *Add python.exe to PATH* while installing).
 
-1. Open the `CrowdSentinel` folder in File Explorer, click the address bar, type `powershell` and press Enter.
-2. Run the one-time setup (creates a virtual environment and installs packages):
-   ```
-   .\setup.bat
-   ```
-3. Start the control room:
-   ```
-   .\run_dashboard.bat
-   ```
-   Then open http://localhost:8000 in your browser. The first start simulates the rally (about 5 minutes) unless `data/scenarios/rally_seed0.npz` is already there.
-4. Run the tests: `.\.venv\Scripts\python -m pytest -q`
-5. Re-run all experiments (about 15 minutes, generates the other 4 scenarios first):
-   ```
-   .\.venv\Scripts\python -m simulation.generate --seeds 1 2 3 4
-   .\.venv\Scripts\python -m experiments.run_experiments
-   ```
+1. **Double-click `complete_setup.bat`.** It creates a virtual environment, installs the packages, runs the tests, installs PyTorch (CPU) and downloads the DM-Count weights and the ShanghaiTech test images. About 10 minutes; progress shows in the window, full output in `logs\complete_setup.log`.
+2. **Double-click `run_dashboard.bat`.** It opens http://localhost:8050. The first start simulates the rally (about 5 minutes) unless `data/scenarios/rally_seed0.npz` is already there.
+3. **Optional: double-click `run_vision_benchmark.bat`** to measure DM-Count on ShanghaiTech (about 50 minutes on a laptop CPU). The ShanghaiTech mirror is a two-part zip in `data\raw\ShanghaiTech_parts`; join and extract it first with 7-Zip (open `ShanghaiTech.zip`) into `data\raw\`.
 
-### Optional: real video (vision module)
+From a terminal in the project folder:
 
-```
-.\.venv\Scripts\pip install -r requirements-vision.txt
-```
-Download DM-Count weights (`model_sha.pth`) from https://github.com/cvlab-stonybrook/DM-Count into `vision/weights/`, then:
-
+- Tests: `.\.venv\Scripts\python -m pytest -q`
+- Re-run all experiments (about 15 minutes, generates the other 4 scenarios first):
+  ```
+  .\.venv\Scripts\python -m simulation.generate --seeds 1 2 3 4
+  .\.venv\Scripts\python -m experiments.run_experiments
+  ```
 - Annotate a crowd video: `.\.venv\Scripts\python -m vision.run_video --video data\raw\crowd.mp4`
-- Measure accuracy on ShanghaiTech: `.\.venv\Scripts\python -m vision.evaluate_density --root data\raw\ShanghaiTech\part_A`
 - Feed a real camera into the twin: `vision/camera_source.py` (`VideoCameraSource`), calibrated with 4 image-to-ground points.
+- Re-record the demo video (dashboard must be running): `python -m tools.record_demo` (needs `pip install playwright`, `python -m playwright install chromium` and ffmpeg).
 
 ## Honest limitations
 
-- **Simulated data.** Ground truth, cell-tower and WiFi feeds come from the crowd simulation. Real tower or WiFi data needs telecom and venue partnerships. The vision module runs on real video, but the density model has not yet been benchmarked in this repo (run `vision/evaluate_density.py`).
+- **Simulated data.** Ground truth, cell-tower and WiFi feeds come from the crowd simulation. Real tower or WiFi data needs telecom and venue partnerships. The vision module is benchmarked on real images (ShanghaiTech) but has not been run on a live event.
 - **One venue, one camera layout.** The cameras deliberately leave the stage's front-left uncovered, as real venues have blind spots. Results depend on this layout.
 - **Simple prediction.** Warnings come from a smoothed density trend: about 1 minute of warning, with 41% alarm precision. A forecast that runs the crowd simulation forward from the live state is the next step.
 - **Sudden changes.** When the crowd suddenly starts leaving, the twin lags for about a minute (visible in the error plot).

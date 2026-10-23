@@ -4,8 +4,8 @@ Runs the digital twin live (one tick every 2 s of event time, speed adjustable),
 pushes every tick to the dashboard over a WebSocket, and stores history for replay.
 
 Start it from the project root:
-    python -m uvicorn backend.main:app --port 8000
-then open http://localhost:8000
+    python -m uvicorn backend.main:app --port 8050
+then open http://localhost:8050
 """
 from __future__ import annotations
 
@@ -149,7 +149,7 @@ class Control(BaseModel):
 
 
 @app.post("/api/control")
-def control(c: Control):
+async def control(c: Control):
     if c.speed is not None:
         live.speed = max(0.25, min(c.speed, 20.0))
     if c.paused is not None:
@@ -167,6 +167,13 @@ def control(c: Control):
         from twin.evacuation import Evacuation
 
         live.engine.evac = Evacuation(live.tr.venue)
+        if live.latest is not None and live.engine.k > 0:
+            # push the new plan right away, even while paused
+            snap = live.engine.snapshot()
+            for key in ("k", "k_max", "speed", "policy"):
+                snap[key] = live.latest.get(key)
+            live.latest = snap
+            await live.broadcast({"type": "tick", "data": snap})
     if c.restart:
         live.gate_override.clear()
         for g in live.tr.venue.gates:

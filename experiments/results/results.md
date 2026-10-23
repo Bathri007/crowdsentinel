@@ -53,9 +53,18 @@ Detected = an alarm fired for that zone between 5 min before and 1 min after it 
 | Kalman, all sources, ACTIVE drone | threshold | 21 / 25 | -2 ± 11 | 100 ± 0% |
 | Kalman, all sources, ACTIVE drone | predictive | 25 / 25 | 69 ± 14 | 41 ± 2% |
 
+## 5. Vision: DM-Count on ShanghaiTech (real images)
+
+Official test sets, authors' pretrained weights, run through `vision/density.py` on a laptop CPU.
+
+| Part | Images | MAE | RMSE | Published MAE / RMSE (Wang et al. 2020) | Seconds per image (CPU) |
+| --- | --- | --- | --- | --- | --- |
+| A (dense) | 182 | 60.3 | 96.6 | 59.7 / 95.7 | 2.1 |
+| B (sparse) | 316 | 7.7 | 12.9 | 7.4 / 11.8 | 2.5 |
+
 ## Honest notes
 
-- Ground truth, tower and WiFi data are simulated. Vision accuracy on real footage is measured separately (vision/evaluate_density.py on ShanghaiTech).
+- Ground truth, tower and WiFi data are simulated. Vision accuracy is measured separately on real images (section 5).
 - The camera layout deliberately leaves the front-left of the stage uncovered, as real venues have blind spots. Results depend on this layout.
 - Prediction is a smoothed-trend extrapolation, so lead times are short when a surge builds fast. Its settings were tuned on seed 0, which is also one of the evaluation seeds.
 - Cell towers did not help in this layout: removing them slightly lowers zone error. Their 10 s delay and coarse sectors add noise when cameras and the drone already cover the crowd. They matter most when cameras fail (see the "without CCTV" row).

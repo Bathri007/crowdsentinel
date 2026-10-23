@@ -1,0 +1,8 @@
+{
+ "dataset": "data\\raw\\ShanghaiTech\\part_A_final",
+ "images": 182,
+ "MAE": 60.25029044098906,
+ "RMSE": 96.57775883388777,
+ "seconds_per_image": 2.111908702195141,
+ "device": "cpu"
+}

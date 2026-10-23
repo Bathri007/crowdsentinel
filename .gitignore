@@ -6,3 +6,8 @@ data/raw/
 data/history.sqlite
 data/scenarios/*.npz
 vision/weights/*.pth
+logs/
+docs/paper/*.aux
+docs/paper/*.log
+docs/paper/*.out
+data/history.sqlite*

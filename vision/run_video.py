@@ -1,6 +1,6 @@
 """Run density + optical flow on a crowd video and save an annotated copy.
 
-    python -m vision.run_video --video data/raw/crowd.mp4 --weights vision/weights/model_sha.pth
+    python -m vision.run_video --video data/raw/crowd.mp4 --weights vision/weights/model_sh_A.pth
 
 Output: data/raw/<name>_annotated.mp4 with a density heat map, motion arrows
 and the live count; plus a per-second CSV of count and mean crowd pressure.
@@ -20,7 +20,7 @@ from .flow import FlowEstimator
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--video", required=True)
-    ap.add_argument("--weights", default="vision/weights/model_sha.pth")
+    ap.add_argument("--weights", default="vision/weights/model_sh_A.pth")
     ap.add_argument("--rate", type=float, default=2.0, help="analysed frames per second")
     ap.add_argument("--seconds", type=float, default=0, help="stop after N seconds (0 = whole video)")
     a = ap.parse_args()
