@@ -165,6 +165,9 @@ body:not(.show-truth) .truth-only { display: none; }
 #scrub { width: 100%; accent-color: var(--sky); margin: 0; }
 
 @media (max-width: 1000px) {
+  html, body { height: auto; }
+  body { grid-template-rows: auto auto auto; }
+  .rail { overflow: visible; }
   .layout { grid-template-columns: 1fr; }
   .rail { border-left: 0; border-top: 1px solid var(--line); }
   .map-wrap { min-height: 60vw; }
